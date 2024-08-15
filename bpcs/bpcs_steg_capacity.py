@@ -58,6 +58,17 @@ class HistogramComplexityImage(ActOnImage):
         log.critical('Approximately {0} bytes of storage space can fit in this vessel image.'.format(nbytes))
         log.critical('{0} byte message would utilize {1:.1%} of the vessel image.'.format(nbytes, percent))
         return hist
+    
+class HistogramComplexityImage_nbytes(ActOnImage):
+    def modify(self, alpha, comp_fcn, grid_size=(8,8)):
+        _, navail, _ = histogram_of_complexity(self.arr, grid_size, alpha, comp_fcn)
+        #log.critical('{0} of {1} grids available with alpha of {2}'.format(navail, ntotal, alpha))
+        nbits_per_grid = grid_size[0]*grid_size[1]
+        nbytes = (get_n_message_grids([nbits_per_grid]*int(navail), int(navail))*nbits_per_grid)/8.0
+        #percent = nbytes*1.0/os.path.getsize(self.infile)
+        #log.critical('Approximately {0} bytes of storage space can fit in this vessel image.'.format(nbytes))
+        #log.critical('{0} byte message would utilize {1:.1%} of the vessel image.'.format(nbytes, percent))
+        return nbytes
 
 class ComplexifyImage(ActOnImage):
     def modify(self, alpha, grid_size=(8,8)):
@@ -79,6 +90,11 @@ def histogram(infile, outfile, alpha, comp_fcn):
         log.critical('Wrote histogram of image complexity to {0}'.format(outfile))
         # plt.show()
 
+def histogram_nbytes(infile, alpha, comp_fcn):
+    x = HistogramComplexityImage_nbytes(infile, as_rgb=True, bitplane=True, gray=True, nbits_per_layer=8)
+    nbytes = x.modify(alpha, comp_fcn)
+    return nbytes
+
 def complexify(infile, outfile, alpha):
     x = ComplexifyImage(infile, as_rgb=True, bitplane=True, gray=True, nbits_per_layer=8)
     arr, stats = x.modify(alpha)
@@ -93,5 +109,9 @@ def simplify(infile, outfile, alpha):
 
 def capacity(infile, alpha=0.45, outfile=None):
     greater = lambda x,thresh: x>=thresh
-    #histogram(infile, outfile, alpha, greater)
-    return greater
+    histogram(infile, outfile, alpha, greater)
+
+def capacity_nbytes(infile, alpha=0.45):
+    greater = lambda x,thresh: x>=thresh
+    nbytes = histogram_nbytes(infile, alpha, greater)
+    return nbytes

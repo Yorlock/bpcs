@@ -23,7 +23,7 @@ import argparse
 
 from .bpcs_steg_decode import decode
 from .bpcs_steg_encode import encode
-from .bpcs_steg_capacity import capacity
+from .bpcs_steg_capacity import capacity, capacity_nbytes
 from .bpcs_steg_test import test_all
 
 __author__ = "Jay Hennig"
@@ -60,5 +60,8 @@ elif opts.behavior == 'encode':
 elif opts.behavior == 'capacity':
     check_file_exists(opts.infile)
     capacity(opts.infile, alpha=opts.alpha, outfile=opts.outfile)
+elif opts.behavior == 'capacity_nbytes':
+    check_file_exists(opts.infile)
+    capacity_nbytes(opts.infile, alpha=opts.alpha)
 elif opts.behavior == 'test':
     test_all()
