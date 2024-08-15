@@ -93,4 +93,5 @@ def simplify(infile, outfile, alpha):
 
 def capacity(infile, alpha=0.45, outfile=None):
     greater = lambda x,thresh: x>=thresh
-    histogram(infile, outfile, alpha, greater)
+    #histogram(infile, outfile, alpha, greater)
+    return greater
